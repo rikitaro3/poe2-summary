@@ -1,94 +1,13 @@
 import os
 import sys
 import json
-import urllib.request
-import urllib.parse
-import urllib.error
 import argparse
-import time
+from trade_client import TradeClient
 
-def load_env_session():
-    # 1階層上の config/.env を見るように修正
-    env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config", ".env")
-    if os.path.exists(env_path):
-        try:
-            with open(env_path, "r", encoding="utf-8") as f:
-                for line in f:
-                    if line.strip() and not line.startswith("#"):
-                        parts = line.strip().split("=", 1)
-                        if len(parts) == 2 and parts[0].strip() == "POESESSID":
-                            return parts[1].strip().strip('"').strip("'")
-        except Exception:
-            pass
-    return None
-
-def load_env_token():
-    env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config", ".env")
-    if os.path.exists(env_path):
-        try:
-            with open(env_path, "r", encoding="utf-8") as f:
-                for line in f:
-                    if line.strip() and not line.startswith("#"):
-                        parts = line.strip().split("=", 1)
-                        if len(parts) == 2 and parts[0].strip() == "POETOKEN":
-                            return parts[1].strip().strip('"').strip("'")
-        except Exception:
-            pass
-    return None
-
-def check_rate_limits(limit_hdr, state_hdr):
-    try:
-        limits = limit_hdr.split(",")
-        states = state_hdr.split(",")
-        for limit, state in zip(limits, states):
-            l_parts = limit.split(":")
-            s_parts = state.split(":")
-            if len(l_parts) == 3 and len(s_parts) == 3:
-                max_req = int(l_parts[0])
-                time_window = int(l_parts[1])
-                cur_req = int(s_parts[0])
-                penalty = int(s_parts[2])
-                
-                if penalty > 0:
-                    print(f"⚠️ Rate limit cooldown active: sleeping for {penalty} seconds.", file=sys.stderr)
-                    time.sleep(penalty + 1)
-                elif cur_req >= max_req * 0.8:
-                    sleep_time = max(1, int(time_window * 0.5))
-                    print(f"⚠️ Rate limit warning ({cur_req}/{max_req} used for {time_window}s window). Safe-sleeping for {sleep_time} seconds...", file=sys.stderr)
-                    time.sleep(sleep_time)
-    except Exception:
-        pass
-
-def send_request_with_retry(req, max_retries=3):
-    for attempt in range(max_retries):
-        try:
-            with urllib.request.urlopen(req) as response:
-                limit_hdr = response.headers.get("X-Rate-Limit-Ip")
-                state_hdr = response.headers.get("X-Rate-Limit-Ip-State")
-                if limit_hdr and state_hdr:
-                    check_rate_limits(limit_hdr, state_hdr)
-                return json.loads(response.read().decode("utf-8"))
-        except urllib.error.HTTPError as e:
-            if e.code == 429:
-                retry_after = e.headers.get("Retry-After")
-                wait_time = int(retry_after) if retry_after else 10
-                state_hdr = e.headers.get("X-Rate-Limit-Ip-State")
-                if state_hdr:
-                    penalty_times = []
-                    for state in state_hdr.split(","):
-                        parts = state.split(":")
-                        if len(parts) == 3:
-                            penalty_times.append(int(parts[2]))
-                    max_penalty = max(penalty_times) if penalty_times else 0
-                    if max_penalty > 0:
-                        wait_time = max(wait_time, max_penalty)
-                
-                print(f"⚠️ Rate limit hit (HTTP 429). Waiting for {wait_time} seconds before retry (Attempt {attempt+1}/{max_retries})...", file=sys.stderr)
-                time.sleep(wait_time + 1)
-                continue
-            else:
-                raise e
-    raise RuntimeError("Max retries exceeded due to rate limit (HTTP 429)")
+def load_query_config():
+    config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config", "trade_queries.json")
+    with open(config_path, "r", encoding="utf-8") as f:
+        return json.load(f)
 
 def main():
     # Windowsターミナルでのエンコードエラー・文字化けを防ぐために標準出力をUTF-8に強制再設定
@@ -134,36 +53,17 @@ def main():
     elif args.any_status:
         status_option = "any" # オフライン含む
 
-    # セッションIDの解決 (引数 -> 環境変数 -> .envファイル)
+    # セッションIDとトークンの解決
     session_id = args.session
-    if not session_id:
-        session_id = os.environ.get("POESESSID")
-    if not session_id:
-        session_id = load_env_session()
-    poe_token = os.environ.get("POETOKEN") or load_env_token()
+    poe_token = os.environ.get("POETOKEN")
 
-    # PoE2 Mod IDのマッピング定義
-    mod_map = {
-        "pseudo_life": "pseudo.pseudo_total_life",
-        "pseudo_res": "pseudo.pseudo_total_resistance",
-        "pseudo_fire": "pseudo.pseudo_total_fire_resistance",
-        "pseudo_cold": "pseudo.pseudo_total_cold_resistance",
-        "pseudo_lightning": "pseudo.pseudo_total_lightning_resistance",
-        "pseudo_chaos": "pseudo.pseudo_total_chaos_resistance",
-        "movement_speed": "explicit.stat_2100679358",
-        "attack_speed": "explicit.stat_210067635",
-        "spell_damage": "explicit.stat_1241851921",
-        "flat_phys": "explicit.stat_1940865751",
-        "flat_cold": "explicit.stat_1037193709",
-        "flat_phys_attacks": "pseudo.pseudo_adds_physical_damage_to_attacks",
-        "flat_cold_attacks": "pseudo.pseudo_adds_cold_damage_to_attacks",
-        "flat_fire_attacks": "pseudo.pseudo_adds_fire_damage_to_attacks",
-        "flat_lightning_attacks": "pseudo.pseudo_adds_lightning_damage_to_attacks",
-        "cast_speed": "explicit.stat_2624005898",
-        "flat_fire_spells": "explicit.stat_131165481",
-        "flat_cold_spells": "explicit.stat_322861266",
-        "flat_lightning_spells": "explicit.stat_2041285220"
-    }
+    # PoE2 Mod IDのマッピング定義（外部JSONからロード）
+    try:
+        config = load_query_config()
+        mod_map = config["mod_map"]
+    except Exception as e:
+        print(f"Failed to load config (mod_map): {str(e)}", file=sys.stderr)
+        sys.exit(1)
 
     # クエリ条件の構築 (ANDフィルター)
     and_filters = []
@@ -269,7 +169,6 @@ def main():
             }
         }
     if args.type:
-        # カテゴリフィルター用のマッピング
         category_map = {
             "ring": "accessory.ring",
             "amulet": "accessory.amulet",
@@ -287,10 +186,8 @@ def main():
         if cat_key in category_map:
             query["query"].setdefault("filters", {}).setdefault("type_filters", {}).setdefault("filters", {})["category"] = {"option": category_map[cat_key]}
         else:
-            # マッピングにない場合は従来のtype検索（特定のベース名などを検索する場合）
             query["query"]["type"] = args.type
 
-    # 追加の取引フィルター（価格上限）
     trade_filters = {}
     if args.max_price > 0:
         trade_filters["price"] = {"max": args.max_price, "option": args.currency}
@@ -300,42 +197,12 @@ def main():
             "filters": trade_filters
         }
 
-    # リーグ名のスペース等をURLエンコード
-    encoded_league = urllib.parse.quote(args.league)
-    
-    # APIリクエストの送信
-    url = f"https://www.pathofexile.com/api/trade2/search/{encoded_league}"
-    headers = {
-        "User-Agent": "PoE2TradeHelper/1.0 (Contact: user-local-script)",
-        "Content-Type": "application/json"
-    }
-    if session_id:
-        headers["Cookie"] = f"POESESSID={session_id}"
-    elif poe_token:
-        headers["Authorization"] = f"Bearer {poe_token}"
-
-    req = urllib.request.Request(
-        url, 
-        data=json.dumps(query).encode("utf-8"), 
-        headers=headers, 
-        method="POST"
-    )
-
+    # TradeClientを使用したリクエスト送信
+    client = TradeClient(league=args.league, session_id=session_id, poe_token=poe_token)
     try:
-        res_data = send_request_with_retry(req)
-        search_id = res_data.get("id")
-        trade_url = f"https://www.pathofexile.com/trade2/search/{encoded_league}/{search_id}"
-        
-        print(f"\n\033[92m[SUCCESS] PoE2トレードURL of 生成に成功しました：\033[0m")
+        trade_url = client.send_request(query)
+        print(f"\n\033[92m[SUCCESS] PoE2トレードURLの生成に成功しました：\033[0m")
         print(f"\033[96m{trade_url}\033[0m\n")
-            
-    except urllib.error.HTTPError as e:
-        error_body = e.read().decode("utf-8")
-        try:
-            error_json = json.loads(error_body)
-            print(f"Error: {error_json['error']['message']}", file=sys.stderr)
-        except Exception:
-            print(f"Error: {e.reason} ({error_body})", file=sys.stderr)
     except Exception as e:
         print(f"Error: {str(e)}", file=sys.stderr)
 

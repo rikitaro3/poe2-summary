@@ -1,205 +1,66 @@
 import os
 import sys
 import json
-import urllib.request
-import urllib.parse
-import urllib.error
 import time
+from trade_client import TradeClient
 
-def load_env_session():
-    # apps/97_poe/config/.env から POESESSID を取得
-    env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config", ".env")
-    if os.path.exists(env_path):
-        try:
-            with open(env_path, "r", encoding="utf-8") as f:
-                for line in f:
-                    if line.strip() and not line.startswith("#"):
-                        parts = line.strip().split("=", 1)
-                        if len(parts) == 2 and parts[0].strip() == "POESESSID":
-                            return parts[1].strip().strip('"').strip("'")
-        except Exception:
-            pass
-    return None
-
-def fetch_trade_url(league, query, session_id):
-    encoded_league = urllib.parse.quote(league)
-    url = f"https://www.pathofexile.com/api/trade2/search/{encoded_league}"
-
-    headers = {
-        "User-Agent": "PoE2TradeHelper/1.0 (Contact: user-local-script)",
-        "Content-Type": "application/json"
-    }
-    if session_id:
-        headers["Cookie"] = f"POESESSID={session_id}"
-
-    req = urllib.request.Request(
-        url,
-        data=json.dumps(query).encode("utf-8"),
-        headers=headers,
-        method="POST"
-    )
-
-    try:
-        with urllib.request.urlopen(req) as response:
-            res_data = json.loads(response.read().decode("utf-8"))
-            search_id = res_data.get("id")
-            return f"https://www.pathofexile.com/trade2/search/{encoded_league}/{search_id}"
-    except urllib.error.HTTPError as e:
-        error_body = e.read().decode("utf-8")
-        print(f"API Error (HTTP {e.code}): {error_body}", file=sys.stderr)
-        return None
-    except Exception as e:
-        print(f"Error: {str(e)}", file=sys.stderr)
-        return None
+def load_query_config():
+    config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config", "trade_queries.json")
+    with open(config_path, "r", encoding="utf-8") as f:
+        return json.load(f)
 
 def main():
-    # ターミナルのエンコード設定
     if sys.stdout.encoding != 'utf-8':
         try:
             sys.stdout.reconfigure(encoding='utf-8')
         except AttributeError:
             pass
 
-    session_id = os.environ.get("POESESSID") or load_env_session()
-    
-    # Suffixes
-    stat_remaining_uses = "pseudo.pseudo_number_of_uses_remaining"
-    stat_fracturing_mirrors = "explicit.stat_551040294"   # Delirium Fog in Map spawns #% increased Fracturing Mirrors
-    stat_mirror_shards = "explicit.stat_900933517"         # Delirium Fog in Map spawns #% increased MirrorShards
-    stat_splinters = "explicit.stat_3836551197"           # #% increased Stack size of Simulacrum Splinters found in Map
-    stat_unique_bosses = "explicit.stat_3962960008"        # Delirium Encounters in Map are #% more likely to spawn Unique Bosses
-
-    # Prefixes (User Requested)
-    stat_rare_monsters_count = "explicit.stat_3793155082"  # Map has #% increased number of Rare Monsters
-    stat_monsters_effectiveness = "explicit.stat_2065500219" # Monsters have #% increased Effectiveness
-    stat_monster_rarity = "explicit.stat_4142653832"        # Map has #% increased Monster Rarity
-
     league = "Runes of Aldur"
+    try:
+        config = load_query_config()
+        queries = config["static_queries"]
+    except Exception as e:
+        print(f"Failed to load config: {str(e)}", file=sys.stderr)
+        sys.exit(1)
 
-    # 共通Prefixグループ (3つのうち1つ以上)
-    prefix_count_group = {
-        "type": "count",
-        "value": {"min": 1},
-        "filters": [
-            {"id": stat_rare_monsters_count, "value": {"min": 25}},
-            {"id": stat_monsters_effectiveness, "value": {"min": 10}},
-            {"id": stat_monster_rarity, "value": {"min": 15}}
-        ]
-    }
+    client = TradeClient(league=league)
+    results = {}
 
-    # 1. 低投資: スプリンター24%アップ ＋ Prefixから1つ以上
-    query_low = {
-        "query": {
-            "status": {"option": "securable"},
-            "stats": [
-                {
-                    "type": "and",
-                    "filters": [
-                        {"id": stat_remaining_uses, "value": {"min": 10}},
-                        {"id": stat_splinters, "value": {"min": 24}}
-                    ]
-                },
-                prefix_count_group
-            ]
-        }
-    }
+    keys = [
+        ("low", "tablet_low_investment", "低投資"),
+        ("med", "tablet_medium_investment", "中投資"),
+        ("high", "tablet_high_investment", "高投資"),
+        ("unid", "tablet_crafting", "クラフト用")
+    ]
 
-    # 2. 中投資: 鏡の破片 ＋ ボスドロップ ＋ Prefixから1つ以上
-    query_med = {
-        "query": {
-            "status": {"option": "securable"},
-            "stats": [
-                {
-                    "type": "and",
-                    "filters": [
-                        {"id": stat_remaining_uses, "value": {"min": 10}},
-                        {"id": stat_mirror_shards, "value": {"min": 5}},
-                        {"id": stat_unique_bosses, "value": {"min": 5}}
-                    ]
-                },
-                prefix_count_group
-            ]
-        }
-    }
-
-    # 3. 高投資: 割れた鏡 ＋ スプリンター ＋ Prefixから1つ以上
-    query_high = {
-        "query": {
-            "status": {"option": "securable"},
-            "stats": [
-                {
-                    "type": "and",
-                    "filters": [
-                        {"id": stat_remaining_uses, "value": {"min": 10}},
-                        {"id": stat_fracturing_mirrors, "value": {"min": 5}},
-                        {"id": stat_splinters, "value": {"min": 15}}
-                    ]
-                },
-                prefix_count_group
-            ]
-        }
-    }
-
-    # 4. クラフト用: マジック未鑑定 ＋ 新品
-    query_unid = {
-        "query": {
-            "status": {"option": "securable"},
-            "type": "Delirium Tablet",
-            "stats": [
-                {
-                    "type": "and",
-                    "filters": [
-                        {"id": stat_remaining_uses, "value": {"min": 10}}
-                    ]
-                }
-            ],
-            "filters": {
-                "misc_filters": {
-                    "filters": {
-                        "identified": {"option": "false"},
-                        "rarity": {"option": "magic"}
-                    }
-                }
-            }
-        }
-    }
-
-    print("Generating Low-investment Trade URL...")
-    url_low = fetch_trade_url(league, query_low, session_id)
-    
-    time.sleep(1.5)  # レートリミット回避
-
-    print("Generating Medium-investment Trade URL...")
-    url_med = fetch_trade_url(league, query_med, session_id)
-    
-    time.sleep(1.5)  # レートリミット回避
-
-    print("Generating High-investment Trade URL...")
-    url_high = fetch_trade_url(league, query_high, session_id)
-
-    time.sleep(1.5)  # レートリミット回避
-
-    print("Generating Unidentified Magic Trade URL...")
-    url_unid = fetch_trade_url(league, query_unid, session_id)
+    for key, config_key, label in keys:
+        print(f"Generating {label} Trade URL...")
+        try:
+            url = client.send_request(queries[config_key])
+            results[key] = url
+        except Exception as e:
+            print(f"Error generating {label} URL: {str(e)}", file=sys.stderr)
+            results[key] = None
+        time.sleep(1.5)  # レートリミットに配慮したインターバル
 
     print("\n==========================================")
     print("[SUCCESS] 投資レベル別Delirium石板用トレードURLの生成に成功しました！")
     print(f"リーグ: {league}")
     print("------------------------------------------")
-    if url_low:
+    if results.get("low"):
         print(f"👉 【低投資】新品(10回) ＋ スプリンター24%+ ＋ [Effectiveness/MonsterRarity/RareMonsters]から1つ以上")
-        print(f"   URL: {url_low}")
-    if url_med:
-        print(f"👉 【中投資】新品(10回) ＋ 鏡の破片5%+ ＋ ボス出現5%+ ＋ [Effectiveness/MonsterRarity/RareMonsters]から1つ以上")
-        print(f"   URL: {url_med}")
-    if url_high:
-        print(f"👉 【高投資】新品(10回) ＋ 分裂ミラー5%+ ＋ スプリンター15%+ ＋ [Effectiveness/MonsterRarity/RareMonsters]から1つ以上")
-        print(f"   URL: {url_high}")
-    if url_unid:
+        print(f"   URL: {results['low']}")
+    if results.get("med"):
+        print(f"👉 【中投資】新品(10回) ＋ 鏡の破片Modあり(値指定なし) ＋ ボス出現Modあり(値指定なし) ＋ [Effectiveness/MonsterRarity/RareMonsters]から1つ以上")
+        print(f"   URL: {results['med']}")
+    if results.get("high"):
+        print(f"👉 【高投資】新品(10回) ＋ 鏡の破片Modあり(値指定なし) ＋ スプリンター24%+ ＋ [Effectiveness/MonsterRarity/RareMonsters]から1つ以上")
+        print(f"   URL: {results['high']}")
+    if results.get("unid"):
         print(f"👉 【クラフト用】新品(10回) ＋ マジック未鑑定 Delirium Tablet")
-        print(f"   URL: {url_unid}")
+        print(f"   URL: {results['unid']}")
     print("==========================================\n")
-
 
 if __name__ == "__main__":
     main()

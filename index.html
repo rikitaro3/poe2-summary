@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>PoE2 Summary & Tools</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="description" content="Path of Exile 2 Farming & Gear Upgrade Guide">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <!-- ダークテーマCSS -->
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/dark.css">
+  <!-- PoE2向けのゴールドアクセント微調整 -->
+  <style>
+    :root {
+      --theme-color: #d4af37; /* ゴールド */
+      --sidebar-background: #111;
+      --background: #181818;
+    }
+    body {
+      background-color: var(--background) !important;
+    }
+    .sidebar {
+      background-color: var(--sidebar-background) !important;
+      border-right: 1px solid #2d2d2d;
+    }
+    .sidebar-nav li a {
+      color: #ccc;
+    }
+    .sidebar-nav li.active > a {
+      color: var(--theme-color) !important;
+      font-weight: bold;
+    }
+    .markdown-section {
+      background-color: var(--background) !important;
+      max-width: 900px;
+      color: #ddd;
+    }
+    /* テーブルの見栄え調整（ダークテーマ用） */
+    .markdown-section table {
+      border-collapse: collapse;
+      width: 100%;
+      background-color: #202020;
+    }
+    .markdown-section th, .markdown-section td {
+      border: 1px solid #3a3a3a;
+      padding: 10px;
+    }
+    .markdown-section th {
+      background-color: #2b2b2b;
+      color: var(--theme-color);
+    }
+    .markdown-section tr:nth-child(2n) {
+      background-color: #1e1e1e;
+    }
+    /* コードブロックのフォント調整 */
+    code, kbd, pre, samp {
+      font-family: 'Consolas', 'Courier New', Courier, monospace;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">読み込み中...</div>
+  <script>
+    window.$docsify = {
+      name: 'PoE2 Summary',
+      repo: 'https://github.com/rikitaro3/poe2-summary',
+      loadSidebar: true,
+      subMaxLevel: 3,
+      auto2top: true,
+      search: {
+        maxAge: 86400000,
+        paths: 'auto',
+        placeholder: '検索...',
+        noData: '結果が見つかりません',
+        depth: 6
+      },
+      copyCode: {
+        buttonText : 'コピー',
+        errorText  : 'エラー',
+        successText: 'コピー完了'
+      }
+    }
+  </script>
+  <!-- Docsify v4 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+  <!-- 各種プラグイン -->
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code/dist/docsify-copy-code.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/emoji.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+{
+  "mod_map": {
+    "pseudo_life": "pseudo.pseudo_total_life",
+    "pseudo_res": "pseudo.pseudo_total_resistance",
+    "pseudo_fire": "pseudo.pseudo_total_fire_resistance",
+    "pseudo_cold": "pseudo.pseudo_total_cold_resistance",
+    "pseudo_lightning": "pseudo.pseudo_total_lightning_resistance",
+    "pseudo_chaos": "pseudo.pseudo_total_chaos_resistance",
+    "movement_speed": "explicit.stat_2100679358",
+    "attack_speed": "explicit.stat_210067635",
+    "spell_damage": "explicit.stat_1241851921",
+    "flat_phys": "explicit.stat_1940865751",
+    "flat_cold": "explicit.stat_1037193709",
+    "flat_phys_attacks": "pseudo.pseudo_adds_physical_damage_to_attacks",
+    "flat_cold_attacks": "pseudo.pseudo_adds_cold_damage_to_attacks",
+    "flat_fire_attacks": "pseudo.pseudo_adds_fire_damage_to_attacks",
+    "flat_lightning_attacks": "pseudo.pseudo_adds_lightning_damage_to_attacks",
+    "cast_speed": "explicit.stat_2624005898",
+    "flat_fire_spells": "explicit.stat_131165481",
+    "flat_cold_spells": "explicit.stat_322861266",
+    "flat_lightning_spells": "explicit.stat_2041285220"
+  },
+  "static_queries": {
+    "waystone_t15_8mod": {
+      "query": {
+        "status": {"option": "securable"},
+        "type": "Waystone (Tier 15)",
+        "stats": [
+          {
+            "type": "and",
+            "filters": [
+              {"id": "pseudo.pseudo_number_of_affix_mods", "value": {"min": 8}}
+            ]
+          }
+        ],
+        "filters": {
+          "trade_filters": {
+            "filters": {
+              "price": {"max": 30, "option": "exalted"}
+            }
+          }
+        }
+      }
+    },
+    "tablet_low_investment": {
+      "query": {
+        "status": {"option": "securable"},
+        "stats": [
+          {
+            "type": "and",
+            "filters": [
+              {"id": "pseudo.pseudo_number_of_uses_remaining", "value": {"min": 10}},
+              {"id": "explicit.stat_3836551197", "value": {"min": 24}}
+            ]
+          },
+          {
+            "type": "count",
+            "value": {"min": 1},
+            "filters": [
+              {"id": "explicit.stat_3793155082", "value": {"min": 25}},
+              {"id": "explicit.stat_2065500219", "value": {"min": 10}},
+              {"id": "explicit.stat_4142653832", "value": {"min": 15}}
+            ]
+          }
+        ]
+      }
+    },
+    "tablet_medium_investment": {
+      "query": {
+        "status": {"option": "securable"},
+        "stats": [
+          {
+            "type": "and",
+            "filters": [
+              {"id": "pseudo.pseudo_number_of_uses_remaining", "value": {"min": 10}},
+              {"id": "explicit.stat_3962960008"},
+              {"id": "explicit.stat_551040294"}
+            ]
+          },
+          {
+            "type": "count",
+            "value": {"min": 1},
+            "filters": [
+              {"id": "explicit.stat_3793155082", "value": {"min": 25}},
+              {"id": "explicit.stat_2065500219", "value": {"min": 10}},
+              {"id": "explicit.stat_4142653832", "value": {"min": 15}}
+            ]
+          }
+        ]
+      }
+    },
+    "tablet_high_investment": {
+      "query": {
+        "status": {"option": "securable"},
+        "stats": [
+          {
+            "type": "and",
+            "filters": [
+              {"id": "pseudo.pseudo_number_of_uses_remaining", "value": {"min": 10}},
+              {"id": "explicit.stat_3836551197", "value": {"min": 24}},
+              {"id": "explicit.stat_551040294"}
+            ]
+          },
+          {
+            "type": "count",
+            "value": {"min": 1},
+            "filters": [
+              {"id": "explicit.stat_3793155082", "value": {"min": 25}},
+              {"id": "explicit.stat_2065500219", "value": {"min": 10}},
+              {"id": "explicit.stat_4142653832", "value": {"min": 15}}
+            ]
+          }
+        ]
+      }
+    },
+    "tablet_crafting": {
+      "query": {
+        "status": {"option": "securable"},
+        "type": "Delirium Tablet",
+        "stats": [
+          {
+            "type": "and",
+            "filters": [
+              {"id": "pseudo.pseudo_number_of_uses_remaining", "value": {"min": 10}}
+            ]
+          }
+        ],
+        "filters": {
+          "misc_filters": {
+            "filters": {
+              "identified": {"option": "false"},
+              "rarity": {"option": "magic"}
+            }
+          }
+        }
+      }
+    }
+  }
+}
