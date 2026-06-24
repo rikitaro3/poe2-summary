@@ -1,14 +1,12 @@
-# 🌀 デリリウムファーム
+# 🌀 デリリウムファームやり方
 都市にデリリウムのせん妄を200%にして、石板4つ付ける。
 
-## 🔗 トレード検索URL (Trade Links)
-
-### 🗺️ マップ (Waystone) 検索
+## 🗺️ マップ (Waystone) 検索リンク
 | 対象アイテム | 主要な検索条件 | トレード検索リンク |
 | :--- | :--- | :--- |
 | **Waystone (T15 マップ)** | T15 ＋ Rare ＋ Corrupted ＋ **8mod確定** ＋ **Monster Rarity 30%以上** ＋ 最大価格 30 Exalted | 👉 [マップトレード検索](https://www.pathofexile.com/trade2/search/Runes%20of%20Aldur/d8lBY9eRiJ) |
 
-### 🌀 投資レベル別 Delirium 石板 検索
+## 🌀 投資レベル別 Delirium 石板 検索リンク
 
 | 投資レベル | 主な検索条件 (Suffix & Prefix) | トレード検索リンク |
 | :--- | :--- | :--- |
@@ -16,8 +14,6 @@
 | **中投資 (ボス特化)** | **ユニークボス出現率 (値の指定なし) ＋ 鏡の破片 (値の指定なし)** ＋ [Effectiveness / Monster Rarity / Rare Monsters] から1つ以上 | 👉 [中投資石板トレード検索](https://www.pathofexile.com/trade2/search/Runes%20of%20Aldur/d8lBJV9bFJ) |
 | **高投資 (超高収益)** | **スプリンタースタック 24%以上 ＋ 鏡の破片 (値の指定なし)** ＋ [Effectiveness / Monster Rarity / Rare Monsters] から1つ以上 | 👉 [高投資石板トレード検索](https://www.pathofexile.com/trade2/search/Runes%20of%20Aldur/PP69jKXMIL) |
 | **クラフト用** | **マジックレアリティ未鑑定**（自分でModをロールしたい場合） | 👉 [クラフト用未鑑定石板検索](https://www.pathofexile.com/trade2/search/Runes%20of%20Aldur/QL7B3jP3Sw) |
-
----
 
 ## 🦅 ジャド (Jado) のアトラスパッシブ設定
 
