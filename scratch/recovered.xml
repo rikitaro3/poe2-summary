@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathOfBuilding2>
+	<Build level="100" className="Huntress" ascendClassName="Spirit Walker" targetVersion="0_1" characterLevelAutoMode="false" mainSocketGroup="5" viewMode="TREE">
+		<PlayerStat stat="AverageDamage" value="64241.88454990

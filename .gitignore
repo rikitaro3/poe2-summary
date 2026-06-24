@@ -1,0 +1,20 @@
+# Python キャッシュファイル
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.venv/
+venv/
+ENV/
+
+# 自動生成される一時出力ファイル (手動作成のレベル51トレードリンク等は除外しない)
+output/current_gear.json
+output/current_gear_summary.md
+output/reference_gear.json
+output/my_gear.json
+
+# 不要な一時ファイル・ゴミファイル
+scratch/pob_decoded.xml
+scratch/raw_props.txt
+scratch/stats.json
