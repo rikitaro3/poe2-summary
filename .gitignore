@@ -21,3 +21,6 @@ scratch/stats.json
 
 # 非公開ドキュメントフォルダ
 private_docs/
+
+# 環境変数・認証情報
+config/.env
