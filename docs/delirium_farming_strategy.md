@@ -33,6 +33,11 @@
 | :--- | :--- | :--- |
 | **低投資** | **スプリンタースタック 24%以上** ＋ **Monster Rarity 15%以上** | 👉 [低投資石板トレード検索](https://www.pathofexile.com/trade2/search/Runes%20of%20Aldur/D67LqjggS5) |
 | **高投資 (超高収益)** | **スプリンタースタック 24%以上 ＋ 鏡の破片 (値の指定なし)** ＋ [Effectiveness / Monster Rarity / Rare Monsters] から1つ以上 | 👉 [高投資石板トレード検索](https://www.pathofexile.com/trade2/search/Runes%20of%20Aldur/PP69jKXMIL) |
+
+## 🛠️ 石板自作用 検索リンク
+
+| 投資レベル | 主な検索条件 (Suffix & Prefix) | トレード検索リンク |
+| :--- | :--- | :--- |
 | **クラフト用** | **マジックレアリティ未鑑定**（自分でModをロールしたい場合） | 👉 [クラフト用未鑑定石板検索](https://www.pathofexile.com/trade2/search/Runes%20of%20Aldur/QL7B3jP3Sw) |
 
 ## 🦅 ジャド (Jado) のアトラスパッシブ設定
