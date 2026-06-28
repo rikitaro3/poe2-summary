@@ -15,9 +15,8 @@ output/reference_gear.json
 output/my_gear.json
 
 # 不要な一時ファイル・ゴミファイル
-scratch/pob_decoded.xml
-scratch/raw_props.txt
-scratch/stats.json
+scratch/
+stats.json
 
 # 非公開ドキュメントフォルダ
 private_docs/

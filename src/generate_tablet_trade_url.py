@@ -49,7 +49,7 @@ def main():
     print(f"リーグ: {league}")
     print("------------------------------------------")
     if results.get("low"):
-        print(f"👉 【低投資】新品(10回) ＋ スプリンター24%+ ＋ [Effectiveness/MonsterRarity/RareMonsters]から1つ以上")
+        print(f"👉 【低投資】新品(10回) ＋ スプリンター24%+ ＋ Monster Rarity 15%+")
         print(f"   URL: {results['low']}")
     if results.get("med"):
         print(f"👉 【中投資】新品(10回) ＋ 鏡の破片Modあり(値指定なし) ＋ ボス出現Modあり(値指定なし) ＋ [Effectiveness/MonsterRarity/RareMonsters]から1つ以上")

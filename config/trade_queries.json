@@ -42,6 +42,37 @@
         }
       }
     },
+    "waystone_simulacrum_iir50": {
+      "query": {
+        "status": {"option": "securable"},
+        "type": "Waystone (Tier 15)",
+        "stats": [
+          {
+            "type": "and",
+            "filters": [
+              {"id": "pseudo.pseudo_number_of_affix_mods", "value": {"min": 8}}
+            ]
+          }
+        ],
+        "filters": {
+          "misc_filters": {
+            "filters": {
+              "corrupted": {"option": "true"}
+            }
+          },
+          "map_filters": {
+            "filters": {
+              "map_iir": {"min": 50}
+            }
+          },
+          "trade_filters": {
+            "filters": {
+              "price": {"max": 30, "option": "exalted"}
+            }
+          }
+        }
+      }
+    },
     "tablet_low_investment": {
       "query": {
         "status": {"option": "securable"},
@@ -50,15 +81,7 @@
             "type": "and",
             "filters": [
               {"id": "pseudo.pseudo_number_of_uses_remaining", "value": {"min": 10}},
-              {"id": "explicit.stat_3836551197", "value": {"min": 24}}
-            ]
-          },
-          {
-            "type": "count",
-            "value": {"min": 1},
-            "filters": [
-              {"id": "explicit.stat_3793155082", "value": {"min": 25}},
-              {"id": "explicit.stat_2065500219", "value": {"min": 10}},
+              {"id": "explicit.stat_3836551197", "value": {"min": 24}},
               {"id": "explicit.stat_4142653832", "value": {"min": 15}}
             ]
           }
