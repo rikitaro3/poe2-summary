@@ -34,6 +34,16 @@
           }
         ],
         "filters": {
+          "misc_filters": {
+            "filters": {
+              "corrupted": {"option": "true"}
+            }
+          },
+          "map_filters": {
+            "filters": {
+              "map_iir": {"min": 30}
+            }
+          },
           "trade_filters": {
             "filters": {
               "price": {"max": 30, "option": "exalted"}

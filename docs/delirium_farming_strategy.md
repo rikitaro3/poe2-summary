@@ -24,7 +24,7 @@
 ## 🗺️ マップ (Waystone) 検索リンク
 | 対象アイテム | 主要な検索条件 | トレード検索リンク |
 | :--- | :--- | :--- |
-| **Waystone (T15 マップ)** | T15 ＋ Rare ＋ Corrupted ＋ **8mod確定** ＋ **Monster Rarity 30%以上** ＋ 最大価格 30 Exalted | 👉 [マップトレード検索](https://www.pathofexile.com/trade2/search/Runes%20of%20Aldur/02EB6yPQIg) |
+| **Waystone (T15 マップ)** | T15 ＋ Rare ＋ Corrupted ＋ **8mod確定** ＋ **Monster Rarity 30%以上** ＋ 最大価格 30 Exalted | 👉 [マップトレード検索](https://www.pathofexile.com/trade2/search/Runes%20of%20Aldur/5nBWvDgdfa) |
 | **シミュラクラム用 Waystone** | T15 ＋ Rare ＋ Corrupted ＋ **8mod確定** ＋ **Item Rarity 50%以上** ＋ 最大価格 30 Exalted | 👉 [シミュラクラム用マップ検索](https://www.pathofexile.com/trade2/search/Runes%20of%20Aldur/nr2y3oalu0) |
 
 ## 🌀 投資レベル別 Delirium 石板 検索リンク
